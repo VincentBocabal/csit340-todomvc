@@ -3,6 +3,7 @@ import { useState } from 'react'
 export default function Todos() {
   const [text, setText] = useState('')
   const [todos, setTodos] = useState([])
+  const [filter, setFilter] = useState('All')
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -13,16 +14,16 @@ export default function Todos() {
     const newTodo = { id: crypto.randomUUID(), text: trimmed, completed: false }
     setTodos([...todos, newTodo])
     setText('')
-  }
- 
+     }
+
   function handleToggle(id) {
     setTodos(
       todos.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       )
     )
-     }
- 
+    }
+
   function handleDelete(id) {
     setTodos(todos.filter((todo) => todo.id !== id))
   }
@@ -37,6 +38,12 @@ export default function Todos() {
     const newState = !allCompleted
     setTodos(todos.map((todo) => ({ ...todo, completed: newState })))
   }
+
+  const filteredTodos = todos.filter((todo) => {
+    if (filter === 'Active') return !todo.completed
+    if (filter === 'Completed') return todo.completed
+    return true
+  })
 
   const itemsLeft = todos.filter((todo) => !todo.completed).length
   const hasCompleted = todos.some((todo) => todo.completed)
@@ -54,13 +61,13 @@ export default function Todos() {
           onChange={(e) => setText(e.target.value)}
             className="h-[65px] w-full py-4 pr-4 pl-[60px] text-2xl shadow-[inset_0_-2px_1px_rgba(0,0,0,0.03)] outline-none placeholder:text-black/40 placeholder:italic focus:shadow-[0_0_2px_2px_#cf7d7d]"
             placeholder="What needs to be done?"
-          />
+          />    
         </form>
-       
+
         {todos.length > 0 && (
           <>
         <main className="relative border-t border-[#e6e6e6]">
-         <input
+          <input
             id="toggle-all"
             type="checkbox"
             className="peer sr-only"
@@ -75,7 +82,8 @@ export default function Todos() {
           </label>
 
            <ul>
-                      {todos.map((todo) => (
+                      
+                      {filteredTodos.map((todo) => (
               <li
                 key={todo.id}
                 className="group relative flex items-center border-b border-[#ededed] text-2xl"
@@ -116,7 +124,13 @@ export default function Todos() {
             <li>
               <button
                 type="button"
-                className="cursor-pointer rounded-[3px] border border-[#b83f45]/20 px-[7px] py-[3px]"
+                
+                onClick={() => setFilter('All')}
+                className={
+                  filter === 'All'
+                    ? 'cursor-pointer rounded-[3px] border border-[#b83f45]/20 px-[7px] py-[3px]'
+                    : 'cursor-pointer rounded-[3px] border border-transparent px-[7px] py-[3px] hover:border-[#b83f45]/10'
+                }
               >
                 All
               </button>
@@ -124,7 +138,13 @@ export default function Todos() {
             <li>
               <button
                 type="button"
-                className="cursor-pointer rounded-[3px] border border-transparent px-[7px] py-[3px] hover:border-[#b83f45]/10"
+                
+                onClick={() => setFilter('Active')}
+                className={
+                  filter === 'Active'
+                    ? 'cursor-pointer rounded-[3px] border border-[#b83f45]/20 px-[7px] py-[3px]'
+                    : 'cursor-pointer rounded-[3px] border border-transparent px-[7px] py-[3px] hover:border-[#b83f45]/10'
+                }
               >
                 Active
               </button>
@@ -132,7 +152,13 @@ export default function Todos() {
             <li>
               <button
                 type="button"
-                className="cursor-pointer rounded-[3px] border border-transparent px-[7px] py-[3px] hover:border-[#b83f45]/10"
+                
+                onClick={() => setFilter('Completed')}
+                className={
+                  filter === 'Completed'
+                    ? 'cursor-pointer rounded-[3px] border border-[#b83f45]/20 px-[7px] py-[3px]'
+                    : 'cursor-pointer rounded-[3px] border border-transparent px-[7px] py-[3px] hover:border-[#b83f45]/10'
+                }
               >
                 Completed
               </button>
@@ -149,10 +175,8 @@ export default function Todos() {
             </button>
           )}
         </footer>
-
-         </>
+        </>
         )}
-
       </div>
     </section>
   )
